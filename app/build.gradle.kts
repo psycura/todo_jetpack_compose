@@ -75,14 +75,14 @@ dependencies {
     annotationProcessor(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
+    // Koin
+    implementation(libs.koin.compose)
+
     // To use Kotlin Symbol Processing (KSP)
     ksp(libs.androidx.room.compiler)
 
     // Datastore preferences
     implementation(libs.androidx.datastore.preferences)
 
-    // Dagger & Hilt
-    ksp(libs.dagger)
-    ksp(libs.hilt)
 
 }
