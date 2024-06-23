@@ -4,16 +4,20 @@ import android.content.Context
 import androidx.room.Room
 import com.example.to_docompose.data.ToDoDao
 import com.example.to_docompose.data.ToDoDatabase
-import com.example.to_docompose.data.repositories.ToDoRepository
+import com.example.to_docompose.data.repositories.TodoRepositoryImpl
+import com.example.to_docompose.domain.interfaces.TodoRepository
+import com.example.to_docompose.ui.viewmodels.SharedViewModel
 import com.example.to_docompose.util.Constants.DATABASE_NAME
-import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 
+
 val appModule = module {
-    single { provideRoomDatabase(androidContext()) }
+    single { provideRoomDatabase(get()) }
     single { provideDao(get()) }
-    single<ToDoRepository> { ToDoRepository(get()) }
+    single<TodoRepository> { TodoRepositoryImpl(get()) }
+    viewModel<SharedViewModel> { SharedViewModel(get()) }
 }
 
 

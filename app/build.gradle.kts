@@ -69,6 +69,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // Navigation
+    implementation(libs.navigation)
 
     // Room
     implementation(libs.androidx.room.runtime)
