@@ -7,4 +7,6 @@
     <string name="delete_all">Delete All</string>
     <string name="open_menu">Open Menu</string>
     <string name="close_search">Close search</string>
+    <string name="sad_face_icon">Sad face</string>
+    <string name="no_tasks_found">No tasks found\n</string>
 </resources>
