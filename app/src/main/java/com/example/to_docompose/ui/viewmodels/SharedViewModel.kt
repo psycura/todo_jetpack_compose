@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.to_docompose.data.models.ToDoTask
 import com.example.to_docompose.domain.interfaces.TodoRepository
+import com.example.to_docompose.util.RequestState
 import com.example.to_docompose.util.SearchAppBarState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,13 +22,30 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
     private val _searchTextState: MutableState<String> = mutableStateOf("")
     val searchTextState: State<String> = _searchTextState
 
-    private val _allTasks = MutableStateFlow<List<ToDoTask>>(emptyList())
-    val allTasks: StateFlow<List<ToDoTask>> = _allTasks
+    private val _allTasks = MutableStateFlow<RequestState<List<ToDoTask>>>(RequestState.Idle)
+    val allTasks: StateFlow<RequestState<List<ToDoTask>>> = _allTasks
+
+    private val _selectedTask = MutableStateFlow<ToDoTask?>(null)
+    val selectedTask: StateFlow<ToDoTask?> = _selectedTask
 
     fun getAllTasks() {
+        _allTasks.value = RequestState.Loading
+        try {
+            viewModelScope.launch {
+                repository.getAllTasks.collect {
+                    _allTasks.value = RequestState.Success(it)
+                }
+            }
+        } catch (e: Exception) {
+            _allTasks.value = RequestState.Error(e)
+        }
+
+    }
+
+    fun getTaskById(taskId: Int) {
         viewModelScope.launch {
-            repository.getAllTasks.collect {
-                _allTasks.value = it
+            repository.getSelectedTask(taskId).collect { task ->
+                _selectedTask.value = task
             }
         }
     }

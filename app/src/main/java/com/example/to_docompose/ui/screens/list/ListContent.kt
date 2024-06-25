@@ -26,25 +26,27 @@ import com.example.to_docompose.ui.theme.LARGE_PADDING
 import com.example.to_docompose.ui.theme.PRIORITY_INDICATOR_SIZE
 import com.example.to_docompose.ui.theme.taskItemBackgroundColor
 import com.example.to_docompose.ui.theme.taskItemTextColor
+import com.example.to_docompose.util.RequestState
 
 @Composable
 fun ListContent(
-    tasks: List<ToDoTask>,
+    tasks: RequestState<List<ToDoTask>>,
     navigateToTaskScreen: (taskId: Int) -> Unit
 ) {
-    if (tasks.isEmpty()) {
-        EmptyContent()
-    } else {
-        LazyColumn {
-            items(
-                items = tasks,
-                key = { task -> task.id }
-            ) { task ->
-                TaskItem(task, navigateToTaskScreen)
+    if (tasks is RequestState.Success) {
+        if (tasks.data.isEmpty()) {
+            EmptyContent()
+        } else {
+            LazyColumn {
+                items(
+                    items = tasks.data,
+                    key = { task -> task.id }
+                ) { task ->
+                    TaskItem(task, navigateToTaskScreen)
+                }
             }
         }
     }
-
 }
 
 @Composable

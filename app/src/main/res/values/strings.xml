@@ -3,10 +3,14 @@
     <string name="add_button">Add Button</string>
     <string name="search_tasks">Search button</string>
     <string name="sort_task">Sort Task</string>
-    <string name="delete_task">Delet Task</string>
+    <string name="delete_task">Delete Task</string>
     <string name="delete_all">Delete All</string>
     <string name="open_menu">Open Menu</string>
     <string name="close_search">Close search</string>
     <string name="sad_face_icon">Sad face</string>
     <string name="no_tasks_found">No tasks found\n</string>
+    <string name="add_task">Add Task</string>
+    <string name="back_arrow">Arrow Back</string>
+    <string name="add_icon">Add icon</string>
+    <string name="update_task">Update Task</string>
 </resources>

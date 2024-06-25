@@ -33,10 +33,8 @@ fun ListScreen(
     }
 
 
-    val allTasks by sharedViewModel.allTasks.collectAsState()
-    for (task in allTasks) {
-        Log.d("ListScreen", "task: ${task.title}")
-    }
+    val allTasksRequest by sharedViewModel.allTasks.collectAsState()
+
     val searchAppBarState: SearchAppBarState by sharedViewModel.searchAppBarState
     val searchTextState: String by sharedViewModel.searchTextState
 
@@ -54,7 +52,7 @@ fun ListScreen(
                     .fillMaxSize()
                     .padding(innerPadding)
             ) {
-                ListContent(allTasks, navigateToTaskScreen)
+                ListContent(allTasksRequest, navigateToTaskScreen)
             }
         },
         floatingActionButton = {
