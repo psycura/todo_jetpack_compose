@@ -27,14 +27,22 @@ import com.example.to_docompose.util.Action
 
 @Composable
 fun TaskAppBarr(
-    navigateToListScreen: (Action) -> Unit
+    navigateToListScreen: (Action) -> Unit,
+    selectedTask: ToDoTask?,
 ) {
-    NewTaskAppBarr(navigateToListScreen = navigateToListScreen)
+    if (selectedTask == null) {
+        NewTaskAppBarr(navigateToListScreen = navigateToListScreen)
+    } else {
+        EditTaskAppBarr(
+            navigateToListScreen = navigateToListScreen,
+            task = selectedTask
+        )
+    }
 }
 
 @Composable
 fun NewTaskAppBarr(
-    navigateToListScreen: (Action) -> Unit
+    navigateToListScreen: (Action) -> Unit,
 ) {
     TopAppBar(
         navigationIcon = {

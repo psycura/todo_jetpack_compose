@@ -42,7 +42,7 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
 
     }
 
-    fun getTaskById(taskId: Int) {
+    fun getSelectedTask(taskId: Int) {
         viewModelScope.launch {
             repository.getSelectedTask(taskId).collect { task ->
                 _selectedTask.value = task
