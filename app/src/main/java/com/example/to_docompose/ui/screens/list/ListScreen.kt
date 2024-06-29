@@ -10,17 +10,21 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.example.to_docompose.R
 import com.example.to_docompose.ui.theme.fabBackgroundColor
 import com.example.to_docompose.ui.theme.topAppBarContentColor
 import com.example.to_docompose.ui.viewmodels.SharedViewModel
+import com.example.to_docompose.util.Action
 import com.example.to_docompose.util.SearchAppBarState
+import kotlinx.coroutines.launch
 
 @Composable
 fun ListScreen(
@@ -37,6 +41,7 @@ fun ListScreen(
 
     val searchAppBarState: SearchAppBarState by sharedViewModel.searchAppBarState
     val searchTextState: String by sharedViewModel.searchTextState
+
 
     Scaffold(
         topBar = {
@@ -77,11 +82,24 @@ fun ListFab(
     }
 }
 
-//@Composable
-//@Preview
-//private fun ListScreenPreview() {
-//    ListScreen(
-//        navigateToTaskScreen = {},
-//        sharedViewModel = koinViewModel(),
-//    )
-//}
+@Composable
+fun DisplaySnackBar(
+    snackbarHostState: SnackbarHostState,
+    handleDatabaseActions: () -> Unit,
+    taskTitle: String,
+    action: Action
+) {
+    handleDatabaseActions()
+
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(key1 = action) {
+        if (action != Action.NO_ACTION) {
+            scope.launch {
+                val snackBarResult = snackbarHostState.showSnackbar(
+                    message = "${action.name} : $taskTitle",
+                    actionLabel = "OK"
+                )
+            }
+        }
+    }
+}

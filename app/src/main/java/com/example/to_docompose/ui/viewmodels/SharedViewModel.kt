@@ -7,8 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.to_docompose.data.models.ToDoTask
 import com.example.to_docompose.domain.interfaces.TodoRepository
+import com.example.to_docompose.util.Action
 import com.example.to_docompose.util.RequestState
 import com.example.to_docompose.util.SearchAppBarState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -27,7 +29,6 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
 
     private val _selectedTask = MutableStateFlow<ToDoTask?>(null)
     val selectedTask: StateFlow<ToDoTask?> = _selectedTask
-
 
 
     fun getAllTasks() {
@@ -71,5 +72,18 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
 
     fun onSearchTextChanged(text: String) {
         _searchTextState.value = text
+    }
+
+
+    fun deleteAllTasks() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteAllTasks()
+        }
+    }
+
+    fun deleteTask(task: ToDoTask) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteTask(task)
+        }
     }
 }

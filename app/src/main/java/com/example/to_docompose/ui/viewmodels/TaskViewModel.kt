@@ -6,10 +6,14 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.to_docompose.data.models.Priority
 import com.example.to_docompose.data.models.ToDoTask
 import com.example.to_docompose.domain.interfaces.TodoRepository
+import com.example.to_docompose.util.Action
 import com.example.to_docompose.util.Constants.MAX_TITLE_LENGTH
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class TaskViewModel(private val repository: TodoRepository) : ViewModel() {
     fun initTask(task: ToDoTask?) {
@@ -19,12 +23,7 @@ class TaskViewModel(private val repository: TodoRepository) : ViewModel() {
         _priority.value = task?.priority ?: Priority.LOW
     }
 
-    init {
-        Log.d("Alitz", "TaskViewModel init")
-    }
-
     private val _id: MutableState<Int> = mutableIntStateOf(0)
-    val id: State<Int> = _id
 
     private val _title: MutableState<String> = mutableStateOf("")
     val title: State<String> = _title
@@ -53,8 +52,37 @@ class TaskViewModel(private val repository: TodoRepository) : ViewModel() {
     }
 
 
-    fun validateFields(): Boolean {
-        return title.value.isNotEmpty() && description.value.isNotEmpty()
+    fun updateTask() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateTask(
+                ToDoTask(
+                    id = _id.value,
+                    title = title.value,
+                    description = description.value,
+                    priority = priority.value
+                )
+            )
+        }
+    }
+
+    fun crateTask() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.addTask(
+                ToDoTask(
+                    title = title.value,
+                    description = description.value,
+                    priority = priority.value
+                )
+            )
+        }
+    }
+
+    fun saveTask(action: Action) {
+        when (action) {
+            Action.ADD -> crateTask()
+            Action.UPDATE -> updateTask()
+            else -> {}
+        }
     }
 
 }

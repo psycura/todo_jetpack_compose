@@ -37,6 +37,7 @@ fun TaskScreen(
                     } else {
 
                         if (fieldsAreValid) {
+                            vm.saveTask(action)
                             navigateToListScreen(action)
                         } else {
                             displayToast(context)
