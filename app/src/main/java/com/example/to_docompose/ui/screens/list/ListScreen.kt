@@ -18,18 +18,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.example.to_docompose.LocalNavController
 import com.example.to_docompose.R
+import com.example.to_docompose.navigation.destinations.navigateToTaskScreen
 import com.example.to_docompose.ui.theme.fabBackgroundColor
 import com.example.to_docompose.ui.theme.topAppBarContentColor
 import com.example.to_docompose.ui.viewmodels.SharedViewModel
 import com.example.to_docompose.util.Action
 import com.example.to_docompose.util.SearchAppBarState
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ListScreen(
-    navigateToTaskScreen: (taskId: Int) -> Unit,
-    sharedViewModel: SharedViewModel
+    sharedViewModel: SharedViewModel = koinViewModel()
 ) {
     LaunchedEffect(key1 = true) {
         Log.d("ListScreen", "LaunchedEffect Triggered")
@@ -41,6 +43,9 @@ fun ListScreen(
 
     val searchAppBarState: SearchAppBarState by sharedViewModel.searchAppBarState
     val searchTextState: String by sharedViewModel.searchTextState
+
+    val navController = LocalNavController.current
+
 
 
     Scaffold(
@@ -57,21 +62,23 @@ fun ListScreen(
                     .fillMaxSize()
                     .padding(innerPadding)
             ) {
-                ListContent(allTasksRequest, navigateToTaskScreen)
+                ListContent(allTasksRequest)
             }
         },
         floatingActionButton = {
-            ListFab(navigateToTaskScreen)
+            ListFab(onFabCLicked = {
+                navController.navigateToTaskScreen(-1)
+            })
         }
     )
 }
 
 @Composable
 fun ListFab(
-    onFabCLicked: (taskId: Int) -> Unit
+    onFabCLicked: () -> Unit
 ) {
     FloatingActionButton(
-        onClick = { onFabCLicked(-1) },
+        onClick = { onFabCLicked() },
         containerColor = MaterialTheme.colorScheme.fabBackgroundColor
     ) {
         Icon(

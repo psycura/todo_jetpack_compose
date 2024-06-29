@@ -20,8 +20,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.to_docompose.LocalNavController
 import com.example.to_docompose.data.models.Priority
 import com.example.to_docompose.data.models.ToDoTask
+import com.example.to_docompose.navigation.destinations.navigateToTaskScreen
 import com.example.to_docompose.ui.theme.LARGE_PADDING
 import com.example.to_docompose.ui.theme.PRIORITY_INDICATOR_SIZE
 import com.example.to_docompose.ui.theme.taskItemBackgroundColor
@@ -30,8 +32,7 @@ import com.example.to_docompose.util.RequestState
 
 @Composable
 fun ListContent(
-    tasks: RequestState<List<ToDoTask>>,
-    navigateToTaskScreen: (taskId: Int) -> Unit
+    tasks: RequestState<List<ToDoTask>>
 ) {
     if (tasks is RequestState.Success) {
         if (tasks.data.isEmpty()) {
@@ -42,7 +43,7 @@ fun ListContent(
                     items = tasks.data,
                     key = { task -> task.id }
                 ) { task ->
-                    TaskItem(task, navigateToTaskScreen)
+                    TaskItem(task)
                 }
             }
         }
@@ -52,14 +53,15 @@ fun ListContent(
 @Composable
 fun TaskItem(
     toDoTask: ToDoTask,
-    navigateToTaskScreen: (taskId: Int) -> Unit
 ) {
+    val navController = LocalNavController.current
+
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.taskItemBackgroundColor,
         shape = RectangleShape,
         shadowElevation = 2.dp,
-        onClick = { navigateToTaskScreen(toDoTask.id) }
+        onClick = { navController.navigateToTaskScreen(toDoTask.id) }
     ) {
         Column(
             modifier = Modifier
@@ -107,6 +109,5 @@ fun TaskItem(
 private fun TaskItemPreview() {
     TaskItem(
         toDoTask = ToDoTask(0, "Test TODO", "test description", Priority.LOW),
-        navigateToTaskScreen = {}
     )
 }
