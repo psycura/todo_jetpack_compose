@@ -2,6 +2,9 @@ package com.example.to_docompose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -47,6 +50,7 @@ fun MyApp() {
 
                     ListScreen(action, sharedViewModel)
                 }
+
                 composable(
                     TASK_SCREEN,
                     arguments = listOf(navArgument(TASK_ARGUMENT_KEY) {
@@ -54,7 +58,13 @@ fun MyApp() {
                     })
                 ) { backStackEntry ->
                     val taskId = backStackEntry.arguments!!.getInt(TASK_ARGUMENT_KEY)
-                    TaskScreen(taskId = taskId, sharedViewModel)
+                    val selectedTask by sharedViewModel.selectedTask.collectAsState()
+
+                    LaunchedEffect(key1 = selectedTask) {
+                        sharedViewModel.getSelectedTask(taskId)
+                    }
+
+                    TaskScreen(task = selectedTask, sharedViewModel)
                 }
             }
         }

@@ -7,13 +7,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.example.to_docompose.LocalNavController
+import com.example.to_docompose.data.models.ToDoTask
 import com.example.to_docompose.navigateToListScreen
 import com.example.to_docompose.ui.viewmodels.SharedViewModel
 
@@ -23,18 +24,18 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun TaskScreen(
-    taskId: Int,
+    task: ToDoTask?,
     sharedViewModel: SharedViewModel,
-    taskViewModel: TaskViewModel = koinViewModel(),
+    taskVm: TaskViewModel = koinViewModel()
 ) {
+    println("Alitz TaskScreen taskId:${task?.id}")
 
-    LaunchedEffect(key1 = taskId) {
-        sharedViewModel.getSelectedTask(taskId)
+    LaunchedEffect(key1 = task) {
+        taskVm.initTask(task)
     }
 
-    val selectedTask by sharedViewModel.selectedTask.collectAsState()
 
-    val fieldsAreValid by remember { derivedStateOf { taskViewModel.fieldsAreValid } }
+    val fieldsAreValid by remember { derivedStateOf { taskVm.fieldsAreValid } }
     val context = LocalContext.current
 
     val navController = LocalNavController.current
@@ -47,9 +48,9 @@ fun TaskScreen(
         } else {
 
             if (fieldsAreValid) {
-                val task = taskViewModel.saveTask(action)
-                Log.d("Alitz", "Task to save: $task")
-                sharedViewModel.setEditedTask(task)
+                val savedTask = taskVm.saveTask(action)
+                Log.d("Alitz", "Task to save: $savedTask")
+                sharedViewModel.setEditedTask(savedTask)
                 navController.navigateToListScreen(action)
             } else {
                 displayToast(context)
@@ -57,16 +58,11 @@ fun TaskScreen(
         }
     }
 
-
-    LaunchedEffect(key1 = selectedTask) {
-        taskViewModel.initTask(selectedTask)
-    }
-
     Scaffold(
         topBar = {
             TaskAppBarr(
                 navigateToListScreen = { handleNavActions(it) },
-                selectedTask = selectedTask
+                selectedTask = task
             )
         },
         content = { innerPadding ->
