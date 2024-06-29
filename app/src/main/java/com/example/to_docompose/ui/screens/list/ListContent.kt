@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.example.to_docompose.LocalNavController
 import com.example.to_docompose.data.models.Priority
 import com.example.to_docompose.data.models.ToDoTask
-import com.example.to_docompose.navigation.destinations.navigateToTaskScreen
+import com.example.to_docompose.navigateToTaskScreen
 import com.example.to_docompose.ui.theme.LARGE_PADDING
 import com.example.to_docompose.ui.theme.PRIORITY_INDICATOR_SIZE
 import com.example.to_docompose.ui.theme.taskItemBackgroundColor

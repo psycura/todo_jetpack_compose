@@ -9,25 +9,26 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.to_docompose.R
 import com.example.to_docompose.components.PriorityDropdown
-import com.example.to_docompose.data.models.Priority
 import com.example.to_docompose.ui.theme.LARGE_PADDING
 import com.example.to_docompose.ui.theme.MEDIUM_PADDING
+import com.example.to_docompose.ui.viewmodels.TaskViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun TaskContent(
-    title: String,
-    onTitleChange: (String) -> Unit,
-    description: String,
-    onDescriptionChange: (String) -> Unit,
-    priority: Priority,
-    onPrioritySelected: (Priority) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    vm: TaskViewModel = koinViewModel()
 ) {
+
+    val title by vm.title
+    val description by vm.description
+    val priority by vm.priority
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -37,7 +38,7 @@ fun TaskContent(
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             value = title,
-            onValueChange = { onTitleChange(it) },
+            onValueChange = { vm.onTitleChanged(it) },
             placeholder = { Text(text = stringResource(R.string.title)) },
             textStyle = MaterialTheme.typography.bodyLarge,
             singleLine = true,
@@ -45,13 +46,13 @@ fun TaskContent(
         )
         PriorityDropdown(
             priority = priority,
-            onPrioritySelected = { onPrioritySelected(it) },
+            onPrioritySelected = { vm.onPriorityChanged(it) },
             modifier = Modifier.padding(vertical = MEDIUM_PADDING)
         )
         OutlinedTextField(
             modifier = Modifier.fillMaxSize(),
             value = description,
-            onValueChange = { onDescriptionChange(it) },
+            onValueChange = { vm.onDescriptionChanged(it) },
             placeholder = { Text(text = stringResource(R.string.description)) },
             textStyle = MaterialTheme.typography.bodyLarge,
             shape = MaterialTheme.shapes.small
@@ -60,15 +61,3 @@ fun TaskContent(
 
 }
 
-@Composable
-@Preview()
-fun TaskContentPreview() {
-    TaskContent(
-        title = "Title",
-        onTitleChange = {},
-        description = "Description",
-        onDescriptionChange = {},
-        priority = Priority.LOW,
-        onPrioritySelected = {}
-    )
-}

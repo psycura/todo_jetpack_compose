@@ -1,6 +1,5 @@
 package com.example.to_docompose.ui.viewmodels
 
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
@@ -52,37 +51,32 @@ class TaskViewModel(private val repository: TodoRepository) : ViewModel() {
     }
 
 
-    fun updateTask() {
+    private fun updateTask(task: ToDoTask) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updateTask(
-                ToDoTask(
-                    id = _id.value,
-                    title = title.value,
-                    description = description.value,
-                    priority = priority.value
-                )
-            )
+            repository.updateTask(task)
         }
     }
 
-    fun crateTask() {
+    private fun createTask(task: ToDoTask) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.addTask(
-                ToDoTask(
-                    title = title.value,
-                    description = description.value,
-                    priority = priority.value
-                )
-            )
+            repository.addTask(task)
         }
     }
 
-    fun saveTask(action: Action) {
+    fun saveTask(action: Action): ToDoTask {
+        val task = ToDoTask(
+            title = title.value,
+            description = description.value,
+            priority = priority.value
+        )
+
         when (action) {
-            Action.ADD -> crateTask()
-            Action.UPDATE -> updateTask()
+            Action.ADD -> createTask(task.copy())
+            Action.UPDATE -> updateTask(task.copy(id = _id.value))
             else -> {}
         }
+
+        return task
     }
 
 }

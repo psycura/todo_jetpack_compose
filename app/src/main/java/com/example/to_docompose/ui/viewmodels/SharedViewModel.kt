@@ -1,5 +1,6 @@
 package com.example.to_docompose.ui.viewmodels
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -30,11 +31,22 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
     private val _selectedTask = MutableStateFlow<ToDoTask?>(null)
     val selectedTask: StateFlow<ToDoTask?> = _selectedTask
 
+    private val _editedTask: MutableState<ToDoTask?> = mutableStateOf(null)
+    val editedTask: State<ToDoTask?> = _editedTask
 
-    fun getAllTasks() {
+    private val _action: MutableState<Action> = mutableStateOf(Action.NO_ACTION)
+    val action: State<Action> = _action
+
+    init {
+        Log.d("Alitz", "SharedViewModel init")
+        getAllTasks()
+    }
+
+
+    private fun getAllTasks() {
         _allTasks.value = RequestState.Loading
         try {
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 repository.getAllTasks.collect {
                     _allTasks.value = RequestState.Success(it)
                 }
@@ -45,13 +57,25 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
 
     }
 
-
     fun getSelectedTask(taskId: Int) {
+        println("Alitz getSelectedTask #1 taskId:$taskId")
         viewModelScope.launch {
+            println("Alitz getSelectedTask #2 taskId:$taskId")
+
             repository.getSelectedTask(taskId).collect { task ->
+                println("Alitz getSelectedTask #3 taskId:$taskId")
+
                 _selectedTask.value = task
             }
         }
+    }
+
+    fun setEditedTask(task: ToDoTask?) {
+        _editedTask.value = task
+    }
+
+    fun setAction(action: Action) {
+        _action.value = action
     }
 
     fun toggleAppBarState() {
@@ -86,4 +110,5 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
             repository.deleteTask(task)
         }
     }
+
 }

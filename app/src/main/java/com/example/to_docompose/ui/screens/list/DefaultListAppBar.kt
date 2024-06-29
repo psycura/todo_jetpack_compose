@@ -29,37 +29,7 @@ import com.example.to_docompose.components.DropdownPriorityItem
 import com.example.to_docompose.data.models.Priority
 import com.example.to_docompose.ui.theme.topAppBarBackgroundColor
 import com.example.to_docompose.ui.theme.topAppBarContentColor
-import com.example.to_docompose.ui.viewmodels.SharedViewModel
-import com.example.to_docompose.util.SearchAppBarState
 
-@Composable
-fun ListAppBar(
-    sharedViewModel: SharedViewModel,
-    searchAppBarState: SearchAppBarState,
-    searchTextState: String
-) {
-
-    when (searchAppBarState) {
-
-        SearchAppBarState.CLOSED -> {
-            DefaultListAppBar(
-                onSearchClicked = { sharedViewModel.toggleAppBarState() },
-                onSortClicked = {},
-                onDeleteClick = {}
-            )
-        }
-
-        else -> {
-            SearchListAppBar(
-                text = searchTextState,
-                onTextChanged = { sharedViewModel.onSearchTextChanged(it) },
-                onSearchClicked = {  },
-                onCloseClicked = { sharedViewModel.toggleAppBarState()}
-            )
-        }
-    }
-
-}
 
 @Composable
 fun DefaultListAppBar(

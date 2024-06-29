@@ -17,7 +17,7 @@ val appModule = module {
     single { provideRoomDatabase(get()) }
     single { provideDao(get()) }
     single<TodoRepository> { TodoRepositoryImpl(get()) }
-    viewModel<SharedViewModel> { SharedViewModel(get()) }
+    viewModel <SharedViewModel> { SharedViewModel(get()) }
     viewModel<TaskViewModel> {
         TaskViewModel(repository = get())
     }

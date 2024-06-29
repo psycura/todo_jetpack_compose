@@ -106,9 +106,9 @@ fun SearchListAppBar(
                 ),
                 keyboardActions = KeyboardActions(
                     onSearch = { onSearchClicked(text) }
-                ),
-
                 )
+
+            )
         }
 
     }

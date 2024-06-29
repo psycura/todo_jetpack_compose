@@ -1,6 +1,5 @@
 package com.example.to_docompose.ui.screens.list
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -10,51 +9,56 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.example.to_docompose.LocalNavController
 import com.example.to_docompose.R
-import com.example.to_docompose.navigation.destinations.navigateToTaskScreen
+import com.example.to_docompose.navigateToTaskScreen
 import com.example.to_docompose.ui.theme.fabBackgroundColor
 import com.example.to_docompose.ui.theme.topAppBarContentColor
 import com.example.to_docompose.ui.viewmodels.SharedViewModel
 import com.example.to_docompose.util.Action
-import com.example.to_docompose.util.SearchAppBarState
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ListScreen(
-    sharedViewModel: SharedViewModel = koinViewModel()
+    action: Action,
+    sharedViewModel: SharedViewModel
 ) {
-    LaunchedEffect(key1 = true) {
-        Log.d("ListScreen", "LaunchedEffect Triggered")
-        sharedViewModel.getAllTasks()
-    }
-
 
     val allTasksRequest by sharedViewModel.allTasks.collectAsState()
 
-    val searchAppBarState: SearchAppBarState by sharedViewModel.searchAppBarState
-    val searchTextState: String by sharedViewModel.searchTextState
-
     val navController = LocalNavController.current
+    val editedTask by sharedViewModel.editedTask
+    val snackbarHostState = remember { SnackbarHostState() }
 
+    DisplaySnackBar(
+        snackbarHostState = snackbarHostState,
+        taskTitle = editedTask?.title ?: "",
+        action = action
+    )
+
+
+    LaunchedEffect(key1 = action) {
+        sharedViewModel.setAction(action)
+    }
 
 
     Scaffold(
-        topBar = {
-            ListAppBar(
-                sharedViewModel,
-                searchAppBarState = searchAppBarState,
-                searchTextState = searchTextState
-            )
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        topBar = { ListAppBar(sharedViewModel) },
+        floatingActionButton = {
+            ListFab(onClick = {
+                navController.navigateToTaskScreen(-1)
+            })
         },
         content = { innerPadding ->
             Column(
@@ -64,21 +68,16 @@ fun ListScreen(
             ) {
                 ListContent(allTasksRequest)
             }
-        },
-        floatingActionButton = {
-            ListFab(onFabCLicked = {
-                navController.navigateToTaskScreen(-1)
-            })
         }
     )
 }
 
 @Composable
 fun ListFab(
-    onFabCLicked: () -> Unit
+    onClick: () -> Unit
 ) {
     FloatingActionButton(
-        onClick = { onFabCLicked() },
+        onClick = { onClick() },
         containerColor = MaterialTheme.colorScheme.fabBackgroundColor
     ) {
         Icon(
@@ -92,11 +91,9 @@ fun ListFab(
 @Composable
 fun DisplaySnackBar(
     snackbarHostState: SnackbarHostState,
-    handleDatabaseActions: () -> Unit,
     taskTitle: String,
     action: Action
 ) {
-    handleDatabaseActions()
 
     val scope = rememberCoroutineScope()
     LaunchedEffect(key1 = action) {
