@@ -2,6 +2,7 @@ package com.example.to_docompose.components
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
@@ -37,7 +38,8 @@ import com.example.to_docompose.ui.theme.PRIORITY_INDICATOR_SIZE
 @Composable
 fun PriorityDropdown(
     priority: Priority,
-    onPrioritySelected: (Priority) -> Unit
+    onPrioritySelected: (Priority) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
     val angle: Float by animateFloatAsState(
@@ -47,13 +49,13 @@ fun PriorityDropdown(
 
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(PRIORITY_DROP_DOWN_HEIGHT)
             .clickable { expanded = !expanded }
             .border(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 shape = MaterialTheme.shapes.small
             ),
         verticalAlignment = Alignment.CenterVertically,
@@ -86,7 +88,9 @@ fun PriorityDropdown(
         }
 
         DropdownMenu(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth(fraction = 0.94f)
+                .background(MaterialTheme.colorScheme.background),
             expanded = expanded,
             onDismissRequest = { expanded = false }) {
             DropdownPriorityItem(

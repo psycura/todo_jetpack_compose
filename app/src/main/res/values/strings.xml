@@ -14,4 +14,6 @@
     <string name="add_icon">Add icon</string>
     <string name="update_task">Update Task</string>
     <string name="drop_down_arrow">Drop Down icon</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
 </resources>
