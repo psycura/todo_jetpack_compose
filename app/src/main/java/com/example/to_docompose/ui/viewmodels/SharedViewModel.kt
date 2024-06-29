@@ -28,6 +28,8 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
     private val _selectedTask = MutableStateFlow<ToDoTask?>(null)
     val selectedTask: StateFlow<ToDoTask?> = _selectedTask
 
+
+
     fun getAllTasks() {
         _allTasks.value = RequestState.Loading
         try {
@@ -41,6 +43,7 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
         }
 
     }
+
 
     fun getSelectedTask(taskId: Int) {
         viewModelScope.launch {

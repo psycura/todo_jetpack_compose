@@ -45,7 +45,7 @@ fun TaskContent(
         )
         PriorityDropdown(
             priority = priority,
-            onPrioritySelected = onPrioritySelected,
+            onPrioritySelected = { onPrioritySelected(it) },
             modifier = Modifier.padding(vertical = MEDIUM_PADDING)
         )
         OutlinedTextField(

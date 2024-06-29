@@ -29,7 +29,7 @@ fun SetupNavigation(navController: NavHostController) {
 
         taskComposable(
             navigateToListScreen = screens.list,
-            sharedViewModel
+            sharedViewModel,
         )
     }
 }
