@@ -1,5 +1,6 @@
 package com.example.to_docompose.components
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +40,11 @@ fun PriorityDropdown(
     onPrioritySelected: (Priority) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val angle: Float by animateFloatAsState(
+        targetValue = if (expanded) 180f else 0f,
+        label = "animation"
+    )
+
 
     Row(
         modifier = Modifier
@@ -52,13 +59,15 @@ fun PriorityDropdown(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Canvas(
-            modifier = Modifier.size(PRIORITY_INDICATOR_SIZE)
+            modifier = Modifier
+                .size(PRIORITY_INDICATOR_SIZE)
                 .weight(1f)
         ) {
             drawCircle(color = priority.color)
         }
         Text(
-            modifier = Modifier.padding(start = MEDIUM_PADDING)
+            modifier = Modifier
+                .padding(start = MEDIUM_PADDING)
                 .weight(8f),
             text = priority.name,
             style = MaterialTheme.typography.bodyMedium,
@@ -67,13 +76,41 @@ fun PriorityDropdown(
             onClick = { expanded = !expanded },
             modifier = Modifier
                 .alpha(alpha = 0.50f)
-                .rotate(0f)
+                .rotate(angle)
                 .weight(1.5f)
         ) {
             Icon(
                 imageVector = Icons.Filled.ArrowDropDown,
                 contentDescription = stringResource(R.string.drop_down_arrow)
             )
+        }
+
+        DropdownMenu(
+            modifier = Modifier.fillMaxWidth(),
+            expanded = expanded,
+            onDismissRequest = { expanded = false }) {
+            DropdownPriorityItem(
+                priority = Priority.LOW,
+                onClick = {
+                    expanded = false
+                    onPrioritySelected(priority)
+                }
+            )
+            DropdownPriorityItem(
+                priority = Priority.MEDIUM,
+                onClick = {
+                    expanded = false
+                    onPrioritySelected(priority)
+                }
+            )
+            DropdownPriorityItem(
+                priority = Priority.HIGH,
+                onClick = {
+                    expanded = false
+                    onPrioritySelected(priority)
+                }
+            )
+
         }
     }
 }

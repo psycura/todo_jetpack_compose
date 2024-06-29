@@ -25,7 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.to_docompose.R
-import com.example.to_docompose.components.PriorityItem
+import com.example.to_docompose.components.DropdownPriorityItem
 import com.example.to_docompose.data.models.Priority
 import com.example.to_docompose.ui.theme.topAppBarBackgroundColor
 import com.example.to_docompose.ui.theme.topAppBarContentColor
@@ -128,40 +128,26 @@ fun SortAction(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            DropdownMenuItem(
-                text = { Text(Priority.LOW.name) },
+            DropdownPriorityItem(
+                priority = Priority.LOW,
                 onClick = {
                     expanded = false
-                    onSortClicked(Priority.LOW)
-                },
-                leadingIcon = {
-                    PriorityItem(priority = Priority.LOW)
+                    onSortClicked(it)
                 }
-
             )
-            DropdownMenuItem(
-                text = { Text(Priority.HIGH.name) },
+            DropdownPriorityItem(
+                priority = Priority.MEDIUM,
                 onClick = {
                     expanded = false
-                    onSortClicked(Priority.HIGH)
-
-                },
-                leadingIcon = {
-                    PriorityItem(priority = Priority.HIGH)
+                    onSortClicked(it)
                 }
-
             )
-            DropdownMenuItem(
-                text = { Text(Priority.NONE.name) },
+            DropdownPriorityItem(
+                priority = Priority.HIGH,
                 onClick = {
                     expanded = false
-                    onSortClicked(Priority.NONE)
-
-                },
-                leadingIcon = {
-                    PriorityItem(priority = Priority.NONE)
+                    onSortClicked(it)
                 }
-
             )
         }
 
