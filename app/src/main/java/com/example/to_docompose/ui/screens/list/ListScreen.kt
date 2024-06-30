@@ -9,8 +9,10 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -48,7 +50,7 @@ fun ListScreen(
 
 
     LaunchedEffect(key1 = action) {
-        sharedViewModel.setAction(action)
+        sharedViewModel.handleDbAction(action)
     }
 
 
@@ -101,9 +103,35 @@ fun DisplaySnackBar(
             scope.launch {
                 val snackBarResult = snackbarHostState.showSnackbar(
                     message = "${action.name} : $taskTitle",
-                    actionLabel = "OK"
+                    duration = SnackbarDuration.Short,
+                    actionLabel = setActionLabel(action)
+                )
+                undoDeletedTask(
+                    action,
+                    snackBarResult,
+                    onUndoClicked = {}
                 )
             }
         }
+    }
+}
+
+private fun setActionLabel(action: Action): String {
+    return if (action == Action.DELETE) {
+        "UNDO"
+    } else {
+        "OK"
+    }
+}
+
+private fun undoDeletedTask(
+    action: Action,
+    snackBarResult: SnackbarResult,
+    onUndoClicked: (Action) -> Unit
+) {
+    if (snackBarResult == SnackbarResult.ActionPerformed
+        && action == Action.DELETE
+    ) {
+        onUndoClicked(Action.UNDO)
     }
 }

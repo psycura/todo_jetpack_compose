@@ -74,8 +74,16 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
         _editedTask.value = task
     }
 
-    fun setAction(action: Action) {
+    fun handleDbAction(action: Action) {
         _action.value = action
+
+        when (action) {
+            Action.DELETE -> deleteTask(editedTask.value!!)
+            Action.DELETE_ALL -> deleteAllTasks()
+            else -> {
+                resetTasks()
+            }
+        }
     }
 
     fun toggleAppBarState() {
@@ -99,16 +107,23 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
     }
 
 
-    fun deleteAllTasks() {
+    private fun deleteAllTasks() {
         viewModelScope.launch(Dispatchers.IO) {
             repository.deleteAllTasks()
         }
     }
 
-    fun deleteTask(task: ToDoTask) {
+    private fun deleteTask(task: ToDoTask) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.deleteTask(task)
         }
+        resetTasks()
+
+    }
+
+    private fun resetTasks(){
+        _selectedTask.value = null
+        _editedTask.value = null
     }
 
 }

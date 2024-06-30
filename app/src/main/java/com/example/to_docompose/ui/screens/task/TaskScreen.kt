@@ -46,8 +46,10 @@ fun TaskScreen(
         if (action == Action.NO_ACTION) {
             navController.navigateToListScreen(action)
         } else {
-
-            if (fieldsAreValid) {
+            if (action == Action.DELETE) {
+                sharedViewModel.setEditedTask(task)
+                navController.navigateToListScreen(action)
+            } else if (fieldsAreValid) {
                 val savedTask = taskVm.saveTask(action)
                 Log.d("Alitz", "Task to save: $savedTask")
                 sharedViewModel.setEditedTask(savedTask)
