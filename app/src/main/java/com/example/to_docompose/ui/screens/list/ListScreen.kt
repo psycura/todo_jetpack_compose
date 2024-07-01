@@ -45,7 +45,8 @@ fun ListScreen(
     DisplaySnackBar(
         snackbarHostState = snackbarHostState,
         taskTitle = editedTask?.title ?: "",
-        action = action
+        action = action,
+        onUndoClicked = { sharedViewModel.handleDbAction(it) }
     )
 
 
@@ -94,7 +95,8 @@ fun ListFab(
 fun DisplaySnackBar(
     snackbarHostState: SnackbarHostState,
     taskTitle: String,
-    action: Action
+    action: Action,
+    onUndoClicked: (Action) -> Unit
 ) {
 
     val scope = rememberCoroutineScope()
@@ -109,7 +111,7 @@ fun DisplaySnackBar(
                 undoDeletedTask(
                     action,
                     snackBarResult,
-                    onUndoClicked = {}
+                    onUndoClicked = { onUndoClicked(it) }
                 )
             }
         }
@@ -129,7 +131,8 @@ private fun undoDeletedTask(
     snackBarResult: SnackbarResult,
     onUndoClicked: (Action) -> Unit
 ) {
-    if (snackBarResult == SnackbarResult.ActionPerformed
+    if (
+        snackBarResult == SnackbarResult.ActionPerformed
         && action == Action.DELETE
     ) {
         onUndoClicked(Action.UNDO)

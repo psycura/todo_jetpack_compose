@@ -35,7 +35,6 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
     val editedTask: State<ToDoTask?> = _editedTask
 
     private val _action: MutableState<Action> = mutableStateOf(Action.NO_ACTION)
-    val action: State<Action> = _action
 
     init {
         Log.d("Alitz", "SharedViewModel init")
@@ -80,9 +79,17 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
         when (action) {
             Action.DELETE -> deleteTask(editedTask.value!!)
             Action.DELETE_ALL -> deleteAllTasks()
+            Action.UNDO -> undoDeleteTask()
             else -> {
-                resetTasks()
+                _selectedTask.value = null
+                _editedTask.value = null
             }
+        }
+    }
+
+    private fun undoDeleteTask() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.addTask(editedTask.value!!)
         }
     }
 
@@ -117,13 +124,7 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             repository.deleteTask(task)
         }
-        resetTasks()
-
-    }
-
-    private fun resetTasks(){
         _selectedTask.value = null
-        _editedTask.value = null
     }
 
 }
