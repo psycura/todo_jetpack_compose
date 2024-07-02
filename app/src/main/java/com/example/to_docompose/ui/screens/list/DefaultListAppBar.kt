@@ -25,6 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.to_docompose.R
+import com.example.to_docompose.components.DisplayAlertDialog
 import com.example.to_docompose.components.DropdownPriorityItem
 import com.example.to_docompose.data.models.Priority
 import com.example.to_docompose.ui.theme.topAppBarBackgroundColor
@@ -63,9 +64,20 @@ fun ListBarActions(
     onSortClicked: (Priority) -> Unit,
     onDeleteClick: () -> Unit
 ) {
+
+    var openDialog by remember { mutableStateOf(false) }
+
+    DisplayAlertDialog(
+        openDialog = openDialog,
+        closeDialog = { openDialog = false },
+        onYesClicked = { onDeleteClick() },
+        title = stringResource(R.string.delete_all_action),
+        message = stringResource(R.string.delete_all_confirmation)
+    )
+
     SearchAction(onSearchClicked)
     SortAction(onSortClicked)
-    DeleteAllAction(onDeleteClick)
+    DeleteAllAction { openDialog = true }
 }
 
 @Composable
