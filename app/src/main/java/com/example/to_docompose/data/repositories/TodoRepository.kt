@@ -32,7 +32,7 @@ class TodoRepositoryImpl(private val dao: ToDoDao) : TodoRepository {
     }
 
     override fun searchTasks(searchQuery: String): Flow<List<ToDoTask>> {
-        return dao.searchDatabase(searchQuery)
+        return dao.searchDatabase(searchQuery = "%$searchQuery%")
     }
 
 }

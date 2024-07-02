@@ -26,7 +26,10 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
     val searchTextState: State<String> = _searchTextState
 
     private val _allTasks = MutableStateFlow<RequestState<List<ToDoTask>>>(RequestState.Idle)
-    val allTasks: StateFlow<RequestState<List<ToDoTask>>> = _allTasks
+    private val allTasks: StateFlow<RequestState<List<ToDoTask>>> = _allTasks
+
+    private val _searchedTasks = MutableStateFlow<RequestState<List<ToDoTask>>>(RequestState.Idle)
+    private val searchedTasks: StateFlow<RequestState<List<ToDoTask>>> = _searchedTasks
 
     private val _selectedTask = MutableStateFlow<ToDoTask?>(null)
     val selectedTask: StateFlow<ToDoTask?> = _selectedTask
@@ -35,6 +38,12 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
     val editedTask: State<ToDoTask?> = _editedTask
 
     private val _action: MutableState<Action> = mutableStateOf(Action.NO_ACTION)
+
+    val tasksToDisplay: StateFlow<RequestState<List<ToDoTask>>>
+        get() = if (_searchAppBarState.value == SearchAppBarState.TRIGGERED && searchedTasks.value is RequestState.Success)
+            searchedTasks
+        else
+            allTasks
 
     init {
         Log.d("Alitz", "SharedViewModel init")
@@ -56,14 +65,34 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
 
     }
 
+    fun searchDb(searchQuery: String) {
+        _searchedTasks.value = RequestState.Loading
+        println("Alitz searchDb RequestState.Loading searchQuery:$searchQuery")
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
+                println("Alitz searchDb RequestState.Loading 2")
+
+                repository.searchTasks(searchQuery).collect {
+                    println("Alitz searchDb RequestState.Success $it")
+
+                    _searchedTasks.value = RequestState.Success(it)
+                }
+            }
+        } catch (e: Exception) {
+            println("Alitz searchDb RequestState.Error")
+
+            _searchedTasks.value = RequestState.Error(e)
+        }
+
+        _searchAppBarState.value = SearchAppBarState.TRIGGERED
+
+    }
+
+
     fun getSelectedTask(taskId: Int) {
-        println("Alitz getSelectedTask #1 taskId:$taskId")
         viewModelScope.launch {
-            println("Alitz getSelectedTask #2 taskId:$taskId")
 
             repository.getSelectedTask(taskId).collect { task ->
-                println("Alitz getSelectedTask #3 taskId:$taskId")
-
                 _selectedTask.value = task
             }
         }
@@ -103,10 +132,19 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
                     _searchTextState.value = ""
                 }
             }
+            SearchAppBarState.TRIGGERED -> {
+                _searchAppBarState.value = SearchAppBarState.CLOSED
+                _searchTextState.value = ""
+                _searchedTasks.value = RequestState.Idle
+            }
 
-            else -> {}
-//            SearchAppBarState.TRIGGERED -> _searchAppBarState.value = SearchAppBarState.CLOSED
         }
+    }
+
+    fun resetAppBarState() {
+        _searchAppBarState.value = SearchAppBarState.CLOSED
+        _searchTextState.value = ""
+        _searchedTasks.value = RequestState.Idle
     }
 
     fun onSearchTextChanged(text: String) {

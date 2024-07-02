@@ -3,6 +3,7 @@ package com.example.to_docompose.ui.screens.list
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import com.example.to_docompose.ui.viewmodels.SharedViewModel
+import com.example.to_docompose.util.Action
 import com.example.to_docompose.util.SearchAppBarState
 
 @Composable
@@ -19,7 +20,7 @@ fun ListAppBar(
             DefaultListAppBar(
                 onSearchClicked = { sharedViewModel.toggleAppBarState() },
                 onSortClicked = {},
-                onDeleteClick = {}
+                onDeleteClick = { sharedViewModel.handleDbAction(Action.DELETE_ALL) }
             )
         }
 
@@ -27,7 +28,7 @@ fun ListAppBar(
             SearchListAppBar(
                 text = searchTextState,
                 onTextChanged = { sharedViewModel.onSearchTextChanged(it) },
-                onSearchClicked = { },
+                onSearchClicked = { sharedViewModel.searchDb(it) },
                 onCloseClicked = { sharedViewModel.toggleAppBarState() }
             )
         }

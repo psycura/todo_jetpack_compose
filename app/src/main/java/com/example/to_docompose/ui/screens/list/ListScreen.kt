@@ -35,8 +35,7 @@ fun ListScreen(
     action: Action,
     sharedViewModel: SharedViewModel
 ) {
-
-    val allTasksRequest by sharedViewModel.allTasks.collectAsState()
+    val tasksToDisplay by sharedViewModel.tasksToDisplay.collectAsState()
 
     val navController = LocalNavController.current
     val editedTask by sharedViewModel.editedTask
@@ -61,6 +60,7 @@ fun ListScreen(
         floatingActionButton = {
             ListFab(onClick = {
                 navController.navigateToTaskScreen(-1)
+                sharedViewModel.resetAppBarState()
             })
         },
         content = { innerPadding ->
@@ -69,7 +69,7 @@ fun ListScreen(
                     .fillMaxSize()
                     .padding(innerPadding)
             ) {
-                ListContent(allTasksRequest)
+                ListContent(tasksToDisplay)
             }
         }
     )
@@ -104,7 +104,7 @@ fun DisplaySnackBar(
         if (action != Action.NO_ACTION) {
             scope.launch {
                 val snackBarResult = snackbarHostState.showSnackbar(
-                    message = "${action.name} : $taskTitle",
+                    message = setMessage(action, taskTitle),
                     duration = SnackbarDuration.Short,
                     actionLabel = setActionLabel(action)
                 )
@@ -123,6 +123,13 @@ private fun setActionLabel(action: Action): String {
         "UNDO"
     } else {
         "OK"
+    }
+}
+
+private fun setMessage(action: Action, taskTitle: String): String {
+    return when (action) {
+        Action.DELETE_ALL -> "All Tasks removed"
+        else -> "${action.name} : $taskTitle"
     }
 }
 
