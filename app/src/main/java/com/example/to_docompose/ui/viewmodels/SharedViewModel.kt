@@ -1,12 +1,13 @@
 package com.example.to_docompose.ui.viewmodels
 
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.to_docompose.data.models.Priority
 import com.example.to_docompose.data.models.ToDoTask
+import com.example.to_docompose.domain.interfaces.DataStoreRepository
 import com.example.to_docompose.domain.interfaces.TodoRepository
 import com.example.to_docompose.util.Action
 import com.example.to_docompose.util.RequestState
@@ -16,7 +17,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
+class SharedViewModel(
+    private val repository: TodoRepository,
+    private val dataStoreRepository: DataStoreRepository,
+) : ViewModel() {
 
     private val _searchAppBarState: MutableState<SearchAppBarState> =
         mutableStateOf(SearchAppBarState.CLOSED)
@@ -39,6 +43,9 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
 
     private val _action: MutableState<Action> = mutableStateOf(Action.NO_ACTION)
 
+    private val _sortState = MutableStateFlow<RequestState<Priority>>(RequestState.Idle)
+    val sortState: StateFlow<RequestState<Priority>> = _sortState
+
     val tasksToDisplay: StateFlow<RequestState<List<ToDoTask>>>
         get() = if (_searchAppBarState.value == SearchAppBarState.TRIGGERED && searchedTasks.value is RequestState.Success)
             searchedTasks
@@ -46,8 +53,28 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
             allTasks
 
     init {
-        Log.d("Alitz", "SharedViewModel init")
         getAllTasks()
+        getSortState()
+    }
+
+    fun persistSortingState(priority: Priority) {
+        viewModelScope.launch(Dispatchers.IO) {
+            dataStoreRepository.saveSortState(priority)
+        }
+    }
+
+    private fun getSortState() {
+        _sortState.value = RequestState.Loading
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
+                dataStoreRepository.readSortState().collect {
+                    _sortState.value = RequestState.Success(it)
+                }
+            }
+        } catch (e: Exception) {
+            _sortState.value = RequestState.Error(e)
+        }
+
     }
 
 
@@ -67,19 +94,15 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
 
     fun searchDb(searchQuery: String) {
         _searchedTasks.value = RequestState.Loading
-        println("Alitz searchDb RequestState.Loading searchQuery:$searchQuery")
         try {
             viewModelScope.launch(Dispatchers.IO) {
-                println("Alitz searchDb RequestState.Loading 2")
 
                 repository.searchTasks(searchQuery).collect {
-                    println("Alitz searchDb RequestState.Success $it")
 
                     _searchedTasks.value = RequestState.Success(it)
                 }
             }
         } catch (e: Exception) {
-            println("Alitz searchDb RequestState.Error")
 
             _searchedTasks.value = RequestState.Error(e)
         }
@@ -132,6 +155,7 @@ class SharedViewModel(private val repository: TodoRepository) : ViewModel() {
                     _searchTextState.value = ""
                 }
             }
+
             SearchAppBarState.TRIGGERED -> {
                 _searchAppBarState.value = SearchAppBarState.CLOSED
                 _searchTextState.value = ""

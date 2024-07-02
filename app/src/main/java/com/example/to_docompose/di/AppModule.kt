@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import com.example.to_docompose.data.ToDoDao
 import com.example.to_docompose.data.ToDoDatabase
+import com.example.to_docompose.data.repositories.DataStoreRepositoryImpl
 import com.example.to_docompose.data.repositories.TodoRepositoryImpl
+import com.example.to_docompose.domain.interfaces.DataStoreRepository
 import com.example.to_docompose.domain.interfaces.TodoRepository
 import com.example.to_docompose.ui.viewmodels.SharedViewModel
 import com.example.to_docompose.ui.viewmodels.TaskViewModel
@@ -16,8 +18,9 @@ import org.koin.dsl.module
 val appModule = module {
     single { provideRoomDatabase(get()) }
     single { provideDao(get()) }
+    single<DataStoreRepository> { DataStoreRepositoryImpl(get()) }
     single<TodoRepository> { TodoRepositoryImpl(get()) }
-    viewModel <SharedViewModel> { SharedViewModel(get()) }
+    viewModel<SharedViewModel> { SharedViewModel(get(), get()) }
     viewModel<TaskViewModel> {
         TaskViewModel(repository = get())
     }
