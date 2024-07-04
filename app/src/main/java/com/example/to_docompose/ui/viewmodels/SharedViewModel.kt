@@ -43,8 +43,6 @@ class SharedViewModel(
 
     private val _action: MutableState<Action> = mutableStateOf(Action.NO_ACTION)
 
-    private val _sortState = MutableStateFlow<RequestState<Priority>>(RequestState.Idle)
-    val sortState: StateFlow<RequestState<Priority>> = _sortState
 
     val tasksToDisplay: StateFlow<RequestState<List<ToDoTask>>>
         get() = if (_searchAppBarState.value == SearchAppBarState.TRIGGERED && searchedTasks.value is RequestState.Success)
@@ -54,27 +52,12 @@ class SharedViewModel(
 
     init {
         getAllTasks()
-        getSortState()
     }
 
     fun persistSortingState(priority: Priority) {
         viewModelScope.launch(Dispatchers.IO) {
             dataStoreRepository.saveSortState(priority)
         }
-    }
-
-    private fun getSortState() {
-        _sortState.value = RequestState.Loading
-        try {
-            viewModelScope.launch(Dispatchers.IO) {
-                dataStoreRepository.readSortState().collect {
-                    _sortState.value = RequestState.Success(it)
-                }
-            }
-        } catch (e: Exception) {
-            _sortState.value = RequestState.Error(e)
-        }
-
     }
 
 
@@ -182,7 +165,7 @@ class SharedViewModel(
         }
     }
 
-    private fun deleteTask(task: ToDoTask) {
+    fun deleteTask(task: ToDoTask) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.deleteTask(task)
         }

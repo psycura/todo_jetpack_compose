@@ -69,7 +69,11 @@ fun ListScreen(
                     .fillMaxSize()
                     .padding(innerPadding)
             ) {
-                ListContent(tasksToDisplay)
+                ListContent(tasksToDisplay,
+                    onSwipeToDismiss = {
+                        sharedViewModel.setEditedTask(it)
+                        sharedViewModel.handleDbAction(Action.DELETE)
+                    })
             }
         }
     )
