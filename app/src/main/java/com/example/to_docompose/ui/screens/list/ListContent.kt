@@ -63,18 +63,18 @@ fun ListContent(
                     items = tasks.data,
                     key = { task -> task.id }
                 ) { task ->
-                    val dismissState = rememberSwipeToDismissBoxState(
-                        positionalThreshold = { 0.3f }
-                    )
+                    val dismissState = rememberSwipeToDismissBoxState()
 
                     val degrees by animateFloatAsState(
                         label = "rotation degrees",
-                        targetValue = if (dismissState.progress < 0.2f) 0f else -45f
+                        targetValue = if (dismissState.progress < 0.5f) 0f else -45f
                     )
 
-                    val isDismissed = dismissState.currentValue == SwipeToDismissBoxValue.EndToStart
+                    val isDismissed =
+                        dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart
+                                && dismissState.progress == 1f
 
-                    if (isDismissed && dismissState.progress > 0.5f) {
+                    if (isDismissed) {
                         onSwipeToDismiss(task)
                     }
 
